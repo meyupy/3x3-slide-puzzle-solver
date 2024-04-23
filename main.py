@@ -80,37 +80,50 @@ index_square_dict[9] = None
 
 class Button:
 
-    def __init__(self, text, width, pos):
-        self.width = width
-        self.height = width // 2
-        self.pressed = False
-        self.body_rect = pygame.Rect(pos, (self.width, self.height))
-        self.body_color = BUTTON_COLOR_1
-        self.text_surf = pixel_font_small.render(text, True, TEXT_COLOR_2)
+    def __init__(self, surface, text, font, x, y, width, height,
+                 button_color_1, button_color_2, text_color, border_radius):
+        self.surface = surface
+        self.button_color_1 = button_color_1
+        self.button_color_2 = button_color_2
+        self.color = button_color_1
+        self.border_radius = border_radius
+        self.body_rect = pygame.rect.Rect(x, y, width, height)
+        self.text_surf = font.render(text, True, text_color)
         self.text_rect = self.text_surf.get_rect(center=self.body_rect.center)
+        self.press_allowed = True
+        self.pressed = False
 
-    def draw(self):
-        pygame.draw.rect(screen, self.body_color, self.body_rect, border_radius=self.width // 12)
-        screen.blit(self.text_surf, self.text_rect)
-
-    def check_button_clicked(self):
-        mouse_pos = pygame.mouse.get_pos()
-        if self.body_rect.collidepoint(mouse_pos):
-            self.body_color = BUTTON_COLOR_2
-            if pygame.mouse.get_pressed()[0]:
+    def is_clicked(self):
+        mouse_pressed = pygame.mouse.get_pressed()[0]
+        if self.body_rect.collidepoint(pygame.mouse.get_pos()):
+            if mouse_pressed:
                 self.pressed = True
-            else:
-                if self.pressed:
-                    self.pressed = False
-                    return True
+            elif self.pressed and self.press_allowed:
+                self.pressed = False
+                return True
         else:
-            self.body_color = BUTTON_COLOR_1
             self.pressed = False
+            if mouse_pressed:
+                self.press_allowed = False
+            else:
+                self.press_allowed = True
         return False
 
+    def draw(self):
+        if self.body_rect.collidepoint(pygame.mouse.get_pos()):
+            self.color = self.button_color_2
+        else:
+            self.color = self.button_color_1
+        pygame.draw.rect(self.surface, self.color, self.body_rect, border_radius=self.border_radius)
+        self.surface.blit(self.text_surf, self.text_rect)
 
-button_solve = Button("Solve", S_WIDTH // 8, item_coordinates["button_1"])
-button_reset = Button("Reset", S_WIDTH // 8, item_coordinates["button_2"])
+
+button_solve = Button(screen, "Solve", pixel_font_small,
+                      item_coordinates["button_1"][0], item_coordinates["button_1"][1], S_WIDTH // 8, S_WIDTH // 16,
+                      BUTTON_COLOR_1, BUTTON_COLOR_2, TEXT_COLOR_2, S_WIDTH // 96)
+button_reset = Button(screen, "Reset", pixel_font_small,
+                      item_coordinates["button_2"][0], item_coordinates["button_2"][1], S_WIDTH // 8, S_WIDTH // 16,
+                      BUTTON_COLOR_1, BUTTON_COLOR_2, TEXT_COLOR_2, S_WIDTH // 96)
 
 
 class Display:
@@ -295,7 +308,7 @@ while True:
 
         square.draw()
 
-    if button_solve.check_button_clicked():
+    if button_solve.is_clicked():
         solution = solve_the_board(current_perm)
         if solution is None:
             solution = "Board is already solved."
@@ -303,7 +316,7 @@ while True:
             solution = ' '.join([str(n) for n in solution])
     button_solve.draw()
 
-    if button_reset.check_button_clicked():
+    if button_reset.is_clicked():
         solution = None
         for square in squares:
             index_square_dict[square.number] = square.number
