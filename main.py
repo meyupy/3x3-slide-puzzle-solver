@@ -1,3 +1,4 @@
+import os
 import pygame
 
 pygame.init()
@@ -8,22 +9,14 @@ SQ_COLOR_1, SQ_COLOR_2 = (159, 159, 159), (151, 151, 151)
 TEXT_COLOR_1, TEXT_COLOR_2 = (223, 223, 223), (79, 79, 79)
 BUTTON_COLOR_1, BUTTON_COLOR_2 = (159, 159, 159), (143, 143, 143)
 
-pixel_font_large = pygame.font.Font("assets/fonts/VT323-Regular.ttf", size=S_HEIGHT//12)
-pixel_font_medium = pygame.font.Font("assets/fonts/VT323-Regular.ttf", size=S_HEIGHT // 18)
-pixel_font_small = pygame.font.Font("assets/fonts/VT323-Regular.ttf", size=S_HEIGHT // 24)
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+pixel_font_large = pygame.font.Font(f"{SCRIPT_DIR}/assets/fonts/VT323-Regular.ttf", size=S_HEIGHT//12)
+pixel_font_medium = pygame.font.Font(f"{SCRIPT_DIR}/assets/fonts/VT323-Regular.ttf", size=S_HEIGHT // 18)
+pixel_font_small = pygame.font.Font(f"{SCRIPT_DIR}/assets/fonts/VT323-Regular.ttf", size=S_HEIGHT // 24)
 
 screen = pygame.display.set_mode((S_WIDTH, S_HEIGHT))
-pygame.display.set_caption("3x3 Slide Puzzle Solver")
-
 clock = pygame.time.Clock()
-
-
-def produce_item_coordinates(s_w, s_h):
-    return {"board": (s_w//8, s_h//4),
-            "display": (s_w//16, s_h//12),
-            "button_1": (3 * s_w // 4, 5 * s_h // 12),
-            "button_2": (3 * s_w // 4, 2 * s_h // 3)}
-
+pygame.display.set_caption("3x3 Slide Puzzle Solver")
 
 def produce_square_coordinates(s_w, m_x, m_y):
     gap = s_w / 48
@@ -32,7 +25,10 @@ def produce_square_coordinates(s_w, m_x, m_y):
             (m_x+2*gap, m_y+16*gap), (m_x+9*gap, m_y+16*gap), (m_x+16*gap, m_y+16*gap)]
 
 
-item_coordinates = produce_item_coordinates(S_WIDTH, S_HEIGHT)
+item_coordinates = {"board": (S_WIDTH // 8, S_HEIGHT // 4),
+                    "display": (S_WIDTH // 16, S_HEIGHT // 12),
+                    "button_1": (3 * S_WIDTH // 4, 5 * S_HEIGHT // 12),
+                    "button_2": (3 * S_WIDTH // 4, 2 * S_HEIGHT // 3)}
 square_coordinates = produce_square_coordinates(S_WIDTH, item_coordinates["board"][0], item_coordinates["board"][1])
 
 board_rect = pygame.Rect(item_coordinates["board"], (S_WIDTH // 2, S_WIDTH // 2))
