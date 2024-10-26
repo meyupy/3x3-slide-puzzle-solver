@@ -21,7 +21,6 @@ pygame.display.set_caption("3x3 Slide Puzzle Solver")
 
 clock = pygame.time.Clock()
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 INPUT_DIR = os.path.join(SCRIPT_DIR, "inputs")
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, "sliced_images")
 input_file_names = next(os.walk(INPUT_DIR), (None, None, []))[2]
